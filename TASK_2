@@ -1,0 +1,49 @@
+# Personal Expense Analysis Dashboard is a data analytics project designed to monitor, analyze, and visualize personal spending behavior.
+The dashboard presents category-wise expenses, monthly expenditure trends, and financial insights through interactive visualizations, 
+supporting effective budget planning and expense management.
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+# Sample Data
+data = {
+    "Date": ["2026-01-01", "2026-01-05", "2026-01-10",
+             "2026-02-02", "2026-02-15", "2026-03-01"],
+    "Category": ["Food", "Travel", "Shopping",
+                 "Bills", "Food", "Entertainment"],
+    "Amount": [500, 1000, 2000, 1500, 700, 1200]
+}
+
+df = pd.DataFrame(data)
+df["Date"] = pd.to_datetime(df["Date"])
+df["Month"] = df["Date"].dt.strftime("%B")
+
+st.title("Personal Expense Analysis Dashboard")
+
+# KPI
+st.metric("Total Expenses", f"₹{df['Amount'].sum()}")
+
+# Category-wise Expenses
+st.subheader("Category-wise Expenses")
+cat_exp = df.groupby("Category")["Amount"].sum().reset_index()
+fig1 = px.bar(cat_exp, x="Category", y="Amount",
+              title="Expenses by Category")
+st.plotly_chart(fig1)
+
+# Monthly Trend
+st.subheader("Monthly Expense Trend")
+month_exp = df.groupby("Month")["Amount"].sum().reset_index()
+fig2 = px.line(month_exp, x="Month", y="Amount",
+               title="Monthly Expense Trend")
+st.plotly_chart(fig2)
+
+# Expense Distribution
+st.subheader("Expense Distribution")
+fig3 = px.pie(df, names="Category", values="Amount",
+              title="Expense Distribution")
+st.plotly_chart(fig3)
+
+# Data Table
+st.subheader("Expense Records")
+st.dataframe(df)
